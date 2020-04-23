@@ -11,9 +11,18 @@ class Carre_Noir: # Définition de notre classe Carre_Noir
     - sa position x dans la grille 3*3 du plateau du jeu
     - sa position y dans la grille 3*3 du plateau du jeu
     - 
-    - son lieu de résidence"""
-
+    - 
+"""
     
-    def __init__(self): # Notre méthode constructeur
+    def __init__(self,x,y): # Notre méthode constructeur
         """Pour l'instant, on ne va définir qu'un seul attribut"""
-        self.nom = "Dupont"
+        self.x=x
+        self.y=y
+        self.pion = None
+
+    def __str__(self):
+        return "N"
+    
+    def Deplacer_Carre(self,x,y):
+        self.x=x
+        self.y=y
