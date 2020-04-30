@@ -5,7 +5,7 @@ Created on Thu Apr 23 15:09:25 2020
 @author: fabie
 """
 
-from Carre_Noir import *
+from Carre_Noir import Carre_Noir
 
 import numpy as np
 
@@ -32,7 +32,8 @@ class Plateau_jeu: # Définition de notre classe Plateau_Jeu
        """Pour l'instant, on ne va définir qu'un seul attribut"""
         
        self.tab = np.empty([3, 3], dtype=Carre_Noir)           
-                
+       self.i_none = 1
+       self.j_none = 1
 
        for i in range(3):
            for j in range(3):
@@ -51,19 +52,35 @@ class Plateau_jeu: # Définition de notre classe Plateau_Jeu
         for i in range(3):
             for j in range(3):
                 if(show_tab[i,j] == None):
-                    show_tab[i,j]=' '
+                    show_tab[i,j]='Vide'
+                elif show_tab[i,j].pion != None:
+                    I_d = str(show_tab[i,j].pion.i_d)
+                    show_tab[i,j]='N - pion'+I_d+' '+ show_tab[i,j].pion.couleur
                 else: 
                     show_tab[i,j]= 'N'
-            
-        
-        print(self.tab)
+                    
+        #print(self.tab)
         print(show_tab)
+        print("\n")
 
-
+    def __getitem__(self,tup):
+        i,j = tup
+        return self.tab[i][j]
+    
+    def __setitem__(self,tup,valeur):
+        i,j = tup
+        self.tab[i,j]=valeur
         
-        
-        
-        
+"""test plateau"""
+"""
+P=Plateau_jeu()
+P.affichePlateau()
+print(P[0,0],P[1,1])
+P[0,0]=None
+print(P[0,0],P[1,1])       
+a=P[1,2]
+""" 
+      
         
         
         
