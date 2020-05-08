@@ -1,6 +1,7 @@
-# Force-3
-def on_est_la_ou_pas():
-	return "et ouai mec ;)"
+Projet Scolaire:
 
-def td_a_14h_LO43():
-	return "sur Discord"
+Jeu Force 3 codé en Python par Jeoffrey Menudier, Antoine Bénis et Fabien Sam
+
+But du projet: coder le jeu force 3 permettant à deux ordinateurs de jouer l'un contre l'autre
+
+Utilisation des algorithmes Min/max et Alpha-Bêta
