@@ -415,11 +415,62 @@ class Jouer:
         else:
             if self.j1.glissement_x2==True:
                 self.j1.glissement_x2=False
-        
+    
+    ##======================================================================
+    ##=======================Fonction éval====================================
+    ##======================================================================   
             
+    def eval_pion_position(self,joueur):
+        tab_pts= [[3,2,3],[2,4,2],[3,2,3]]
+        res = 0
+        if joueur.pion1 != None:
+            res += tab_pts[joueur.pion1.x,joueur.pion1.y]
         
-                
+        if joueur.pion2 != None:
+            res += tab_pts[joueur.pion2.x,joueur.pion2.y]
             
+        if joueur.pion3 != None:
+            res += tab_pts[joueur.pion3.x,joueur.pion3.y]
+        
+        return res
+    
+    def eval_nb_pions(self, joueur):
+        nb_pion_joueur=0
+        nb_pion_adverse=0
+        for i in range(3):
+            for j in range(3):
+               if self.plateau[i,j].pion != None:
+                   if self.plateau[i,j].pion.color == joueur.couleur:
+                       nb_pion_joueur+=1
+                    
+                   else:
+                       nb_pion_adverse+=1
+                        
+        if nb_pion_joueur>nb_pion_adverse:
+            return 1
+        
+        elif nb_pion_joueur<nb_pion_adverse:
+            return -1
+        
+        else:
+            return 0
+        
+    def evaluation(self, joueur):
+        if joueur == self.j1 and self.victoire(self.j1):
+            return 50
+        if joueur == self.j1 and self.victoire(self.j2):
+            return -50
+        
+        if joueur == self.j2 and self.victoire(self.j2):
+            return 50
+        if joueur == self.j2 and self.victoire(self.j1):
+            return -50
+        
+        else:
+            poids1 = self.eval_pion_position(joueur)
+            poids1 += self.eval_nb_pions(joueur)
+            return  poids1
+        
                 
             
             
