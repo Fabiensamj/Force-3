@@ -10,6 +10,7 @@ from Carre_Noir import Carre_Noir
 from Joueur import Joueur
 from Plateau_Jeu import Plateau_jeu
 from Jouer import Jouer
+from Jouer import victoire
 
 nom_j1 = input("entrez le nom du joueur 1 : ")
 couleur_j1 = input("entrez la couleur du joueur 1 : ")
@@ -28,7 +29,7 @@ while res == False:
     jouer.plateau.affichePlateau()
     jouer.choix_action_joueur(j1)
     gagnant = j1.nom
-    resj1=jouer.victoire(j1)
+    resj1=victoire(j1,jouer.plateau)
     
     if resj1 == True:
         res=True
@@ -36,7 +37,7 @@ while res == False:
         jouer.plateau.affichePlateau()
         jouer.choix_action_joueur(j2)
         gagnant = j2.nom
-        resj2=jouer.victoire(j2)
+        resj2=victoire(j2,jouer.plateau)
        
         if resj2 == True:
             res=True

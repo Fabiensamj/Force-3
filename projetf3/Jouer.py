@@ -59,8 +59,10 @@ class Jouer:
         
         else:
             i,j = joueur.pion3.x, joueur.pion3.y
+            
             joueur.pion3.deplacer_pion(carre.x,carre.y)
             carre.pion = joueur.pion3
+            
             self.plateau[i,j].pion = None
      
     def deplacement_glissement(self,carre):
@@ -71,6 +73,7 @@ class Jouer:
         if carre.pion != None: #si le carre possede un pion on change les coordonées du pion également
             carre.pion.x = carre.x
             carre.pion.y = carre.y
+            
         self.plateau[self.plateau.i_none,self.plateau.j_none]=carre #l'ancien espace vide contient désormais le carre noir
         self.plateau[i,j]=None #l'ancienne position du carre devient l'espace vide
         self.plateau.i_none = i
@@ -143,83 +146,7 @@ class Jouer:
             self.plateau[1,2] = None
             self.plateau.i_none,self.plateau.j_none = 1,2
 
-    def victoire(self,joueur):
-        """
-        Pour évaluer si un jouer à gagner, on doit définir tous les prédicats menant à la
-        victoire, soit tous les façon de gagner
-        """
-        """victoire : 3 pions sur la 1ere ligne"""
-        res = False #on initialise le résultat de la victioreà faux
-        #on vérifie que toutes les 3 cases de la 1ere ligne contiennent 3 pions de même couleur
-        
-        #on ajoute un carre noir ne contenant pas de pion à l'espace vide pour pouvoir effectuer tous les tests
-        #on retirera cette ajout pour avoir notre espace vide à la fin du test
-        self.plateau[self.plateau.i_none,self.plateau.j_none] = Carre_Noir(self.plateau.i_none,self.plateau.j_none)
-        
-        if (self.plateau[0,0].pion != None and self.plateau[0,1].pion != None
-            and self.plateau[0,2].pion != None and self.plateau[0,0].pion.couleur == 
-            self.plateau[0,1].pion.couleur == self.plateau[0,2].pion.couleur):
-                res = True #on renvoit la victoire à True si c'est le cas
-            
-        #"""victoire : 3 pions sur la 2eme ligne"""
-        
-        #on vérifie que toutes les 3 cases de la 2eme ligne contiennent 3 pions de même couleur
-        if (self.plateau[1,0].pion != None and self.plateau[1,1].pion != None
-            and self.plateau[1,2].pion != None and self.plateau[1,0].pion.couleur == 
-            self.plateau[1,1].pion.couleur == self.plateau[1,2].pion.couleur):
-                res = True #on renvoit la victoire à True si c'est le cas
-            
-        #"""victoire : 3 pions sur la 3eme ligne"""
-        
-        #on vérifie que toutes les 3 cases de la 3eme ligne contiennent 3 pions de même couleur
-        if (self.plateau[2,0].pion != None and self.plateau[2,1].pion != None
-            and self.plateau[2,2].pion != None and self.plateau[2,0].pion.couleur == 
-            self.plateau[2,1].pion.couleur == self.plateau[2,2].pion.couleur):
-                res = True #on renvoit la victoire à True si c'est le cas
-            
-        #"""victoire : 3 pions sur la 1ere colonne"""
-        
-        #on vérifie que toutes les 3 cases de la 1ere colonne contiennent 3 pions de même couleur
-        if (self.plateau[0,0].pion != None and self.plateau[1,0].pion != None
-            and self.plateau[2,0].pion != None and self.plateau[0,0].pion.couleur == 
-            self.plateau[1,0].pion.couleur == self.plateau[2,0].pion.couleur):
-                res = True #on renvoit la victoire à True si c'est le cas
-            
-        #"""victoire : 3 pions sur la 2e colonne"""
-        
-        #on vérifie que toutes les 3 cases de la 2e colonne contiennent 3 pions de même couleur
-        if (self.plateau[0,1].pion != None and self.plateau[1,1].pion != None
-            and self.plateau[2,1].pion != None and self.plateau[0,1].pion.couleur == 
-            self.plateau[1,1].pion.couleur == self.plateau[2,1].pion.couleur):
-                res = True #on renvoit la victoire à True si c'est le cas
-            
-         #"""victoire : 3 pions sur la 3e colonne"""
-        
-        #on vérifie que toutes les 3 cases de la 3e colonne contiennent 3 pions de même couleur
-        if (self.plateau[0,2].pion != None and self.plateau[1,2].pion != None
-            and self.plateau[2,2].pion != None and self.plateau[0,2].pion.couleur == 
-            self.plateau[1,2].pion.couleur == self.plateau[2,2].pion.couleur):
-                res = True #on renvoit la victoire à True si c'est le cas
-            
-         #"""victoire : 3 pions sur la 1ere diagonale"""
-        
-        #on vérifie que toutes les 3 cases de la 1ere diagonale contiennent 3 pions de même couleur
-        if (self.plateau[0,0].pion != None and self.plateau[1,1].pion != None
-            and self.plateau[2,2].pion != None and self.plateau[0,0].pion.couleur == 
-            self.plateau[1,1].pion.couleur == self.plateau[2,2].pion.couleur):
-                res = True #on renvoit la victoire à True si c'est le cas
-            
-        #"""victoire : 3 pions sur la 2eme diagonale"""
-        
-        #on vérifie que toutes les 3 cases de la 2eme diagonale contiennent 3 pions de même couleur
-        if (self.plateau[2,0].pion != None and self.plateau[1,1].pion != None
-            and self.plateau[0,2].pion != None and self.plateau[2,0].pion.couleur == 
-            self.plateau[1,1].pion.couleur == self.plateau[0,2].pion.couleur):
-                res = True #on renvoit la victoire à True si c'est le cas
-        
-        #on retire le carre ajouté pour retrouver l'espace vide initial
-        self.plateau[self.plateau.i_none,self.plateau.j_none] = None
-        return res #on renvoit la valeur du booléen
+    
 
     def choix_action_joueur(self,joueur):
         print(joueur.nom,"à vous de jouer")
@@ -415,13 +342,101 @@ class Jouer:
         else:
             if self.j1.glissement_x2==True:
                 self.j1.glissement_x2=False
-<<<<<<< HEAD
+
     
-    ##======================================================================
-    ##=======================Fonction éval====================================
-    ##======================================================================   
+
+        
+                
             
-    def eval_pion_position(self,joueur):
+
+        
+            
+        
+                
+            
+def victoire(joueur,plateau):
+        """
+        Pour évaluer si un jouer à gagner, on doit définir tous les prédicats menant à la
+        victoire, soit tous les façon de gagner
+        """
+        """victoire : 3 pions sur la 1ere ligne"""
+        res = False #on initialise le résultat de la victioreà faux
+        #on vérifie que toutes les 3 cases de la 1ere ligne contiennent 3 pions de même couleur
+        
+        #on ajoute un carre noir ne contenant pas de pion à l'espace vide pour pouvoir effectuer tous les tests
+        #on retirera cette ajout pour avoir notre espace vide à la fin du test
+        plateau[plateau.i_none,plateau.j_none] = Carre_Noir(plateau.i_none,plateau.j_none)
+        
+        if (plateau[0,0].pion != None and plateau[0,1].pion != None
+            and plateau[0,2].pion != None and plateau[0,0].pion.couleur == 
+            plateau[0,1].pion.couleur == plateau[0,2].pion.couleur) == joueur.couleur:
+                res = True #on renvoit la victoire à True si c'est le cas
+            
+        #"""victoire : 3 pions sur la 2eme ligne"""
+        
+        #on vérifie que toutes les 3 cases de la 2eme ligne contiennent 3 pions de même couleur
+        if (plateau[1,0].pion != None and plateau[1,1].pion != None
+            and plateau[1,2].pion != None and plateau[1,0].pion.couleur == 
+            plateau[1,1].pion.couleur == plateau[1,2].pion.couleur == joueur.couleur):
+                res = True #on renvoit la victoire à True si c'est le cas
+            
+        #"""victoire : 3 pions sur la 3eme ligne"""
+        
+        #on vérifie que toutes les 3 cases de la 3eme ligne contiennent 3 pions de même couleur
+        if (plateau[2,0].pion != None and plateau[2,1].pion != None
+            and plateau[2,2].pion != None and plateau[2,0].pion.couleur == 
+            plateau[2,1].pion.couleur == plateau[2,2].pion.couleur == joueur.couleur):
+                res = True #on renvoit la victoire à True si c'est le cas
+            
+        #"""victoire : 3 pions sur la 1ere colonne"""
+        
+        #on vérifie que toutes les 3 cases de la 1ere colonne contiennent 3 pions de même couleur
+        if (plateau[0,0].pion != None and plateau[1,0].pion != None
+            and plateau[2,0].pion != None and plateau[0,0].pion.couleur == 
+            plateau[1,0].pion.couleur == plateau[2,0].pion.couleur == joueur.couleur):
+                res = True #on renvoit la victoire à True si c'est le cas
+            
+        #"""victoire : 3 pions sur la 2e colonne"""
+        
+        #on vérifie que toutes les 3 cases de la 2e colonne contiennent 3 pions de même couleur
+        if (plateau[0,1].pion != None and plateau[1,1].pion != None
+            and plateau[2,1].pion != None and plateau[0,1].pion.couleur == 
+            plateau[1,1].pion.couleur == plateau[2,1].pion.couleur == joueur.couleur):
+                res = True #on renvoit la victoire à True si c'est le cas
+            
+         #"""victoire : 3 pions sur la 3e colonne"""
+        
+        #on vérifie que toutes les 3 cases de la 3e colonne contiennent 3 pions de même couleur
+        if (plateau[0,2].pion != None and plateau[1,2].pion != None
+            and plateau[2,2].pion != None and plateau[0,2].pion.couleur == 
+            plateau[1,2].pion.couleur == plateau[2,2].pion.couleur == joueur.couleur):
+                res = True #on renvoit la victoire à True si c'est le cas
+            
+         #"""victoire : 3 pions sur la 1ere diagonale"""
+        
+        #on vérifie que toutes les 3 cases de la 1ere diagonale contiennent 3 pions de même couleur
+        if (plateau[0,0].pion != None and plateau[1,1].pion != None
+            and plateau[2,2].pion != None and plateau[0,0].pion.couleur == 
+            plateau[1,1].pion.couleur == plateau[2,2].pion.couleur == joueur.couleur):
+                res = True #on renvoit la victoire à True si c'est le cas
+            
+        #"""victoire : 3 pions sur la 2eme diagonale"""
+        
+        #on vérifie que toutes les 3 cases de la 2eme diagonale contiennent 3 pions de même couleur
+        if (plateau[2,0].pion != None and plateau[1,1].pion != None
+            and plateau[0,2].pion != None and plateau[2,0].pion.couleur == 
+            plateau[1,1].pion.couleur == plateau[0,2].pion.couleur == joueur.couleur):
+                res = True #on renvoit la victoire à True si c'est le cas
+        
+        #on retire le carre ajouté pour retrouver l'espace vide initial
+        plateau[plateau.i_none,plateau.j_none] = None
+        return res #on renvoit la valeur du booléen                
+            
+##======================================================================
+##=======================Fonction éval====================================
+##======================================================================   
+            
+def eval_pion_position(joueur):
         tab_pts= [[3,2,3],[2,4,2],[3,2,3]]
         res = 0
         if joueur.pion1 != None:
@@ -435,13 +450,13 @@ class Jouer:
         
         return res
     
-    def eval_nb_pions(self, joueur):
+def eval_nb_pions(joueur,plateau):
         nb_pion_joueur=0
         nb_pion_adverse=0
         for i in range(3):
             for j in range(3):
-               if self.plateau[i,j].pion != None:
-                   if self.plateau[i,j].pion.color == joueur.couleur:
+               if plateau[i,j].pion != None:
+                   if plateau[i,j].pion.color == joueur.couleur:
                        nb_pion_joueur+=1
                     
                    else:
@@ -454,36 +469,19 @@ class Jouer:
             return -1
         
         else:
-            return 0
+            return 0    
         
-    def evaluation(self, joueur):
-        if joueur == self.j1 and self.victoire(self.j1):
+def evaluation(joueur_max,joueur_min,plateau):
+        if victoire(joueur_max):
             return 50
-        if joueur == self.j1 and self.victoire(self.j2):
-            return -50
-        
-        if joueur == self.j2 and self.victoire(self.j2):
-            return 50
-        if joueur == self.j2 and self.victoire(self.j1):
+        if victoire(joueur_min):
             return -50
         
         else:
-            poids1 = self.eval_pion_position(joueur)
-            poids1 += self.eval_nb_pions(joueur)
-            return  poids1
-        
+            poids1 = eval_pion_position(joueur_max)
+            poids1 += eval_nb_pions(joueur_max)
+            return  poids1    
                 
-            
-=======
-        
-            
-        
-                
-            
-                
-            
->>>>>>> c3879fa7e49e80b53bbfd151acfdc76938427dea
-            
    
 
 """test de la classe jouer"""
