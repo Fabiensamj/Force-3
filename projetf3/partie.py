@@ -27,7 +27,7 @@ gagnant = ''
 
 while res == False:
     jouer.plateau.affichePlateau()
-    jouer.choix_action_joueur(j1)
+    jouer.choix_action_ia(j1)
     gagnant = j1.nom
     resj1=victoire(j1,jouer.plateau)
     

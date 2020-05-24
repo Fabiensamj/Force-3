@@ -8,6 +8,11 @@ from Pion import Pion
 from Carre_Noir import Carre_Noir
 from Joueur import Joueur
 from Plateau_Jeu import Plateau_jeu
+from Node import *
+import copy
+import numpy as np
+import math
+import random
 
 class Jouer:
     """ cette classe va définir toutes les actions que les joueurs peuvent faire 
@@ -146,7 +151,56 @@ class Jouer:
             self.plateau[1,2] = None
             self.plateau.i_none,self.plateau.j_none = 1,2
 
-    
+
+##======================================================================#
+##======================Fonctions Actions personnages===================#
+##======================================================================# 
+
+
+    def choix_action_ia(self,joueur):
+        
+        if joueur == self.j1:
+            
+            autre_joueur = self.j2
+        else:
+            autre_joueur = self.j1
+        
+        le_joueur = copy.deepcopy(joueur)
+        lautre_joueur = copy.deepcopy(autre_joueur)
+        noeud = Node(3,le_joueur,lautre_joueur,self.plateau)
+        
+        v = MinMaxPL(noeud, noeud.profondeur,joueur,autre_joueur)
+        print(v)
+        print(joueur.couleur)
+        meilleure_action = []
+        for i in range(len(noeud.enfants)):
+            if noeud.enfants[i].valeur == v:
+                meilleure_action.append(noeud.enfants[i])
+                
+        if len(meilleure_action) > 1:
+            rand_enfant = random.choice(meilleure_action)
+        
+        else:
+            print(meilleure_action)
+            rand_enfant = meilleure_action[0]
+            
+        if rand_enfant.action.num_action == 1:
+            self.poser_pion(joueur, self.plateau[rand_enfant.action.x,rand_enfant.action.y])
+        if rand_enfant.action.num_action == 2:
+            self.deplacement_glissement(self.plateau[rand_enfant.action.x,rand_enfant.action.y])
+        if rand_enfant.action.num_action == 3:
+            if rand_enfant.action.num_pion == 1:
+                self.deplacer_pion(joueur, joueur.pion1, self.plateau[rand_enfant.action.x,rand_enfant.action.y])
+            if rand_enfant.action.num_pion == 2:
+                self.deplacer_pion(joueur, joueur.pion2, self.plateau[rand_enfant.action.x,rand_enfant.action.y])
+            if rand_enfant.action.num_pion == 3:
+                self.deplacer_pion(joueur, joueur.pion3, self.plateau[rand_enfant.action.x,rand_enfant.action.y])
+        if rand_enfant.action.num_action == 4:
+            self.double_glissement()
+            joueur.glissement_x2=True
+        if autre_joueur.glissement_x2==True:
+                autre_joueur.glissement_x2 = False
+       
 
     def choix_action_joueur(self,joueur):
         print(joueur.nom,"à vous de jouer")
@@ -369,7 +423,7 @@ def victoire(joueur,plateau):
         
         if (plateau[0,0].pion != None and plateau[0,1].pion != None
             and plateau[0,2].pion != None and plateau[0,0].pion.couleur == 
-            plateau[0,1].pion.couleur == plateau[0,2].pion.couleur) == joueur.couleur:
+            plateau[0,1].pion.couleur == plateau[0,2].pion.couleur == joueur.couleur):
                 res = True #on renvoit la victoire à True si c'est le cas
             
         #"""victoire : 3 pions sur la 2eme ligne"""
@@ -437,7 +491,7 @@ def victoire(joueur,plateau):
 ##======================================================================   
             
 def eval_pion_position(joueur):
-        tab_pts= [[3,2,3],[2,4,2],[3,2,3]]
+        tab_pts= np.array([[3,2,3],[2,4,2],[3,2,3]])
         res = 0
         if joueur.pion1 != None:
             res += tab_pts[joueur.pion1.x,joueur.pion1.y]
@@ -455,8 +509,8 @@ def eval_nb_pions(joueur,plateau):
         nb_pion_adverse=0
         for i in range(3):
             for j in range(3):
-               if plateau[i,j].pion != None:
-                   if plateau[i,j].pion.color == joueur.couleur:
+               if plateau[i,j] != None and plateau[i,j].pion != None:
+                   if plateau[i,j].pion.couleur == joueur.couleur:
                        nb_pion_joueur+=1
                     
                    else:
@@ -472,17 +526,268 @@ def eval_nb_pions(joueur,plateau):
             return 0    
         
 def evaluation(joueur_max,joueur_min,plateau):
-        if victoire(joueur_max):
-            return 50
-        if victoire(joueur_min):
-            return -50
+        
+        if victoire(joueur_max,plateau):
+            return 50.
+        if victoire(joueur_min,plateau):
+            return -50.
         
         else:
             poids1 = eval_pion_position(joueur_max)
-            poids1 += eval_nb_pions(joueur_max)
+            poids1 += eval_nb_pions(joueur_max,plateau)
             return  poids1    
                 
-   
+##======================================================================#
+##=======================Fonction MinMax================================#
+##======================================================================# 
+            
+        
+def MaxValue(noeud, profondeur,joueur,autre_joueur):
+    if(victoire(joueur,noeud.plateau) or profondeur == 0 ):
+        noeud.valeur = evaluation(joueur,autre_joueur,noeud.plateau)
+        return evaluation(joueur,autre_joueur,noeud.plateau)
+    noeud.valeur = -50.
+    for i in range (len(noeud.enfants)):
+         
+        noeud.valeur = max(noeud.valeur,MinValue(noeud.enfants[i],profondeur-1,joueur,autre_joueur))
+    return noeud.valeur
+
+
+def MinValue(noeud, profondeur,joueur,autre_joueur):
+    if(victoire(joueur,noeud.plateau) or profondeur == 0 ):
+        noeud.valeur = evaluation(joueur,noeud.autre_joueur,noeud.plateau)
+        return evaluation(joueur,autre_joueur,noeud.plateau)
+    noeud.valeur = 50.
+    for i in range (len(noeud.enfants)):
+        
+        noeud.valeur = min(noeud.valeur, MaxValue(noeud.enfants[i],profondeur-1,joueur,autre_joueur))
+    return noeud.valeur
+                
+        
+def MinMaxPL(noeud,profondeur,joueur,autre_joueur):
+    noeud.valeur = MaxValue(noeud,profondeur,joueur,autre_joueur)
+    return noeud.valeur 
+
+
+
+
+##======================================================================
+##=======================Aretes de l'arbre====================================
+##====================================================================== 
+class Arete_Action():
+    
+    def __init__(self, num_action, x=None, y=None,num_pion=None):
+        self._num_action = num_action
+        self._x = x
+        self._y = y
+        self._num_pion = num_pion
+    def _get_num_action(self):
+        return self._num_action
+    
+    def _get_x(self):
+        return self._x
+    
+    def _get_y(self):
+        return self._y
+    
+    def _get_num_pion(self):
+        return self._num_pion
+    
+    num_action = property(_get_num_action)
+    x = property(_get_x)
+    y = property(_get_y)
+    num_pion = property(_get_num_pion)
+##======================================================================
+##=======================Création de l'arbre============================
+##====================================================================== 
+
+class Node():
+    def __init__(self,profondeur,joueur,autre_joueur,plateau,action_joue = None, valeur = None):
+        self.profondeur=profondeur
+        self.joueur=joueur
+        self.autre_joueur=autre_joueur
+        self.action=action_joue
+        self.valeur=valeur
+        self.enfants= []
+        self.plateau=plateau
+        self.jeu = Jouer(copy.deepcopy(self.plateau),copy.deepcopy(self.joueur),copy.deepcopy(self.autre_joueur))
+        self.creer_enfants()
+        
+    def actions_possibles(self):
+        
+        res_actions = []
+        if victoire(self.joueur,self.plateau) != True or victoire(self.autre_joueur,self.plateau) != True:
+            
+            cout_double = self.autre_joueur.glissement_x2
+       
+            if (self.joueur.nb_pion[0] != None):
+                res_actions = [1,2]
+            
+            elif (self.joueur.nb_pion[0] == None and self.joueur.nb_pion[2] != None ):
+                res_actions = [1,2,3]
+            
+            else :
+                res_actions = [2,3]
+            
+            if ((cout_double==False) and 
+                ((self.plateau.i_none == 0 and self.plateau.j_none == 1) or 
+                  (self.plateau.i_none == 1 and self.plateau.j_none == 0) or 
+                  (self.plateau.i_none == 2 and self.plateau.j_none == 1) or 
+                  (self.plateau.i_none == 1 and self.plateau.j_none == 2))):
+                res_actions.append(4)
+                self.joueur.glissement_x2 = True
+            
+            if self.autre_joueur.glissement_x2 == True:
+                self.autre_joueur.glissement_x2 == False
+            
+            
+        return res_actions
+        
+    def creer_enfants(self):
+        for i in range(3):
+            for j in range(3):
+                if (self.plateau[i,j] != None and self.plateau[i,j].pion != None):
+                    idt = self.plateau[i,j].pion.i_d
+                    
+                    couleur = self.plateau[i,j].pion.couleur
+                    if self.joueur.couleur == couleur:
+                        if idt == 1:
+                            self.joueur.pion1.x,self.joueur.pion1.y = self.plateau[i,j].x,self.plateau[i,j].y
+                        if idt == 2:
+                            self.joueur.pion2.x,self.joueur.pion2.y = self.plateau[i,j].x,self.plateau[i,j].y
+                        if idt == 3:
+                            self.joueur.pion3.x,self.joueur.pion3.y = self.plateau[i,j].x,self.plateau[i,j].y
+                    
+                    else:
+                        if idt == 1:
+                            self.autre_joueur.pion1.x,self.autre_joueur.pion1.y = self.plateau[i,j].x,self.plateau[i,j].y
+                        if idt == 2:
+                            self.autre_joueur.pion2.x,self.autre_joueur.pion2.y = self.plateau[i,j].x,self.plateau[i,j].y
+                        if idt == 3:
+                            self.autre_joueur.pion3.x,self.autre_joueur.pion3.y = self.plateau[i,j].x,self.plateau[i,j].y
+        
+        coups_permis = self.actions_possibles()
+        
+        if self.profondeur > 0 and coups_permis != []:
+            
+            for i in range(len(coups_permis)):
+                coup = coups_permis[i]
+                
+                
+                
+                
+                if coup == 1:
+                    
+                    for x in range(3):
+                        for y in range(3):
+                            self.jeu.plateau = copy.deepcopy(self.plateau)
+                            self.jeu.j1 = copy.deepcopy(self.joueur)
+                            self.jeu.j2 = copy.deepcopy(self.autre_joueur)
+                            
+                            
+                            if ((x,y) != (self.jeu.plateau.i_none,self.jeu.plateau.j_none) and 
+                                self.jeu.plateau[x,y].pion == None):
+                                
+                                self.jeu.poser_pion(self.jeu.j1,self.jeu.plateau[x,y])
+                                action = Arete_Action(1,x,y)
+                                self.enfants.append(Node(self.profondeur-1,self.jeu.j2,
+                                                         self.jeu.j1,self.jeu.plateau,action))
+                                
+                                
+                if coup == 2:
+                  
+                    for x in range(3):
+                        for y in range(3):
+                            self.jeu.plateau = copy.deepcopy(self.plateau)
+                            self.jeu.j1 = copy.deepcopy(self.joueur)
+                            self.jeu.j2 = copy.deepcopy(self.autre_joueur)
+                            
+                            if ((x,y) != (self.jeu.plateau.i_none,self.jeu.plateau.j_none) and 
+                                (self.jeu.plateau.i_none == x and self.jeu.plateau.j_none == y-1) or
+                                (self.jeu.plateau.i_none == x and self.jeu.plateau.j_none == y+1) or
+                                (self.jeu.plateau.i_none == x-1 and self.jeu.plateau.j_none == y) or
+                                (self.jeu.plateau.i_none == x+1 and self.jeu.plateau.j_none == y)):
+                         
+                                self.jeu.deplacement_glissement(self.jeu.plateau[x,y])
+                                action = Arete_Action(2,x,y)
+                                self.enfants.append(Node(self.profondeur-1,self.jeu.j2,
+                                                         self.jeu.j1,self.jeu.plateau,action))
+                              
+                if coup == 3:
+                    
+                    if self.joueur.pion1 != None:
+                        for x in range(3):
+                            for y in range(3):
+                                self.jeu.plateau = copy.deepcopy(self.plateau)
+                                self.jeu.j1 = copy.deepcopy(self.joueur)
+                                self.jeu.j2 = copy.deepcopy(self.autre_joueur)
+                                
+                                if ((x,y) != (self.jeu.plateau.i_none,self.jeu.plateau.j_none) and
+                                    self.jeu.plateau[x,y].pion == None):
+                                    
+                                    self.jeu.deplacer_pion(self.jeu.j1,self.jeu.j1.pion1,self.jeu.plateau[x,y])
+                                    action = Arete_Action(3,x,y,1)
+                                    self.enfants.append(Node(self.profondeur-1,self.jeu.j2,
+                                                         self.jeu.j1,self.jeu.plateau,action))
+                                    
+                    if self.joueur.pion2 != None:
+                        for x in range(3):
+                            for y in range(3):
+                                self.jeu.plateau = copy.deepcopy(self.plateau)
+                                self.jeu.j1 = copy.deepcopy(self.joueur)
+                                self.jeu.j2 = copy.deepcopy(self.autre_joueur)
+                                if ((x,y) != (self.jeu.plateau.i_none,self.jeu.plateau.j_none) and
+                                    self.jeu.plateau[x,y].pion == None):
+                                     
+                                    self.jeu.deplacer_pion(self.jeu.j1,self.jeu.j1.pion2,self.jeu.plateau[x,y])
+                                    action = Arete_Action(3,x,y,2)
+                                    self.enfants.append(Node(self.profondeur-1,self.jeu.j2,
+                                                         self.jeu.j1,self.jeu.plateau,action))
+                                    
+                    if self.joueur.pion3 != None:
+                        for x in range(3):
+                            for y in range(3):
+                                self.jeu.plateau = copy.deepcopy(self.plateau)
+                                self.jeu.j1 = copy.deepcopy(self.joueur)
+                                self.jeu.j2 = copy.deepcopy(self.autre_joueur)
+                             
+                                if ((x,y) != (self.jeu.plateau.i_none,self.jeu.plateau.j_none) and
+                                    self.jeu.plateau[x,y].pion == None):
+                                    
+                                    self.jeu.deplacer_pion(self.jeu.j1,self.jeu.j1.pion3,self.jeu.plateau[x,y])
+                                    action = Arete_Action(3,x,y,3)
+                                    self.enfants.append(Node(self.profondeur-1,self.jeu.j2,
+                                                         self.jeu.j1,self.jeu.plateau,action))
+                                    
+                
+                                    
+                if coup == 4:
+                    self.jeu.plateau = copy.deepcopy(self.plateau)
+                    self.jeu.j1 = copy.deepcopy(self.joueur)
+                    self.jeu.j2 = copy.deepcopy(self.autre_joueur)
+                    
+                    self.jeu.double_glissement()
+                    action = Arete_Action(4)
+                    self.enfants.append(Node(self.profondeur-1,self.jeu.j2,
+                                        self.jeu.j1,self.jeu.plateau,action))
+                    
+       
+                    
+    def affiche(self):
+        print("pere")
+        self.plateau.affichePlateau()
+        print("enfants")
+        for i in range(len(self.enfants)):
+            self.enfants[i].plateau.affichePlateau()
+                            
+
+###test###
+# node = Node(3,Joueur("jean","r"),Joueur("pierre","b"),Plateau_jeu())                  
+# node.affiche()
+# node.enfants[0].affiche()
+# node.enfants[0].enfants[0].affiche()
+# #node.enfants[0].enfants[0].enfants[0].affiche()
+# #node.enfants[0].enfants[0].enfants[8].enfants[16].affiche()  
 
 """test de la classe jouer"""
 """
