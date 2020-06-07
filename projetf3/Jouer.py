@@ -4,9 +4,9 @@ Created on Thu Apr 23 23:53:08 2020
 
 @author: jeome
 """
-from Pion import Pion
-from Carre_Noir import Carre_Noir
-from Joueur import Joueur
+from Plateau_Jeu import Pion
+from Plateau_Jeu import Carre_Noir
+from Plateau_Jeu import Joueur
 from Plateau_Jeu import Plateau_jeu
 from Node import *
 import copy
@@ -84,72 +84,70 @@ class Jouer:
         self.plateau.i_none = i
         self.plateau.j_none = j #on réattribut les coordonnées de l'espace vide dans la classe plateau
         
-    def double_glissement(self):
-        #""" cas où l'espace vide est en haut en (0,1)"""
-        if (self.plateau.i_none,self.plateau.j_none) == (0,1):
-            
-            #on change les coordonnées du 1er carre qui va être déplacé et du pion s'il y en a
-            self.plateau[1,1].x,self.plateau[1,1].y = 0,1 
-            if self.plateau[1,1].pion != None:
-                self.plateau[1,1].pion.x,self.plateau[1,1].pion.y = 0,1
-            #on change les coordonnées du 2e carre qui va être déplacé et du pion s'il y en a
-            self.plateau[2,1].x,self.plateau[2,1].y = 1,1
-            if self.plateau[2,1].pion != None:
-                self.plateau[2,1].pion.x,self.plateau[2,1].pion.y = 1,1
-            #on déplace les carrées sur le plateau et on y affecte le nouvel espace vide 
-            self.plateau[0,1] = self.plateau[1,1]
-            self.plateau[1,1] = self.plateau[2,1]
-            self.plateau[2,1] = None
-            self.plateau.i_none,self.plateau.j_none = 2,1
-            
-        #"""on fait de même pour les 3 autres cas"""
-        #""" cas où l'espace vide est en haut en (2,1)"""
-        elif (self.plateau.i_none,self.plateau.j_none) == (2,1):
-            #on change les coordonnées du 1er carre qui va être déplacé et du pion s'il y en a
-            self.plateau[1,1].x,self.plateau[1,1].y = 2,1 
-            if self.plateau[1,1].pion != None:
-                self.plateau[1,1].pion.x,self.plateau[1,1].pion.y = 2,1
-            #on change les coordonnées du 2e carre qui va être déplacé et du pion s'il y en a
-            self.plateau[0,1].x,self.plateau[0,1].y = 1,1
-            if self.plateau[0,1].pion != None:
-                self.plateau[0,1].pion.x,self.plateau[0,1].pion.y = 1,1
-            #on déplace les carrées sur le plateau et on y affecte le nouvel espace vide 
-            self.plateau[2,1] = self.plateau[1,1]
-            self.plateau[1,1] = self.plateau[0,1]
-            self.plateau[0,1] = None
-            self.plateau.i_none,self.plateau.j_none = 0,1
+    def double_glissement(self,direction = None):
+        direct = direction
+        if direct == None: #si le vide est aux extrémité mais pas aux angles
+            # cas où l'espace vide est en haut en (0,1)
+            if (self.plateau.i_none,self.plateau.j_none) == (0,1):
+                self.deplacement_glissement(self.plateau[1,1])
+                self.deplacement_glissement(self.plateau[2,1])
         
-        #""" cas où l'espace vide est en haut en (1,2)"""
-        elif (self.plateau.i_none,self.plateau.j_none) == (1,2):
-            #on change les coordonnées du 1er carre qui va être déplacé et du pion s'il y en a
-            self.plateau[1,1].x,self.plateau[1,1].y = 1,2 
-            if self.plateau[1,1].pion != None:
-                self.plateau[1,1].pion.x,self.plateau[1,1].pion.y = 1,2
-            #on change les coordonnées du 2e carre qui va être déplacé et du pion s'il y en a
-            self.plateau[1,0].x,self.plateau[1,0].y = 1,1
-            if self.plateau[1,0].pion != None:
-                self.plateau[1,0].pion.x,self.plateau[1,0].pion.y = 1,1
-            #on déplace les carrées sur le plateau et on y affecte le nouvel espace vide 
-            self.plateau[1,2] = self.plateau[1,1]
-            self.plateau[1,1] = self.plateau[1,0]
-            self.plateau[1,0] = None
-            self.plateau.i_none,self.plateau.j_none = 1,0
+            #on fait de même pour les 3 autres cas
+            # cas où l'espace vide est en haut en (2,1)
+            elif (self.plateau.i_none,self.plateau.j_none) == (2,1):
+                self.deplacement_glissement(self.plateau[1,1])
+                self.deplacement_glissement(self.plateau[0,1])
+        
+            # cas où l'espace vide est en haut en (1,2)
+            elif (self.plateau.i_none,self.plateau.j_none) == (1,2):
+                self.deplacement_glissement(self.plateau[1,1])
+                self.deplacement_glissement(self.plateau[1,0])
             
-        #""" cas où l'espace vide est en haut en (1,0)"""
-        elif (self.plateau.i_none,self.plateau.j_none) == (1,0):
-            #on change les coordonnées du 1er carre qui va être déplacé et du pion s'il y en a
-            self.plateau[1,1].x,self.plateau[1,1].y = 1,0 
-            if self.plateau[1,1].pion != None:
-                self.plateau[1,1].pion.x,self.plateau[1,1].pion.y = 1,0
-            #on change les coordonnées du 2e carre qui va être déplacé et du pion s'il y en a
-            self.plateau[1,2].x,self.plateau[1,2].y = 1,1
-            if self.plateau[1,2].pion != None:
-                self.plateau[1,2].pion.x,self.plateau[1,2].pion.y = 1,1
-            #on déplace les carrées sur le plateau et on y affecte le nouvel espace vide 
-            self.plateau[1,0] = self.plateau[1,1]
-            self.plateau[1,1] = self.plateau[1,2]
-            self.plateau[1,2] = None
-            self.plateau.i_none,self.plateau.j_none = 1,2
+            # cas où l'espace vide est en haut en (1,0)
+            elif (self.plateau.i_none,self.plateau.j_none) == (1,0):
+                self.deplacement_glissement(self.plateau[1,1])
+                self.deplacement_glissement(self.plateau[1,2])
+        
+        else: #si le vide est aux angles
+            if (self.plateau.i_none,self.plateau.j_none) == (0,0):
+                if direct == 'g':
+                    self.deplacement_glissement(self.plateau[0,1])
+                    self.deplacement_glissement(self.plateau[0,2])
+                
+                elif direct == 'h':
+                    self.deplacement_glissement(self.plateau[1,0])
+                    self.deplacement_glissement(self.plateau[2,0])
+            
+            elif (self.plateau.i_none,self.plateau.j_none) == (0,2):
+                if direct == 'd':
+                    self.deplacement_glissement(self.plateau[0,1])
+                    self.deplacement_glissement(self.plateau[0,0])
+                
+                elif direct == 'h':
+                    self.deplacement_glissement(self.plateau[1,2])
+                    self.deplacement_glissement(self.plateau[2,2])
+                    
+            elif (self.plateau.i_none,self.plateau.j_none) == (2,0):
+                if direct == 'g':
+                    self.deplacement_glissement(self.plateau[2,1])
+                    self.deplacement_glissement(self.plateau[2,2])
+                
+                elif direct == 'b':
+                    self.deplacement_glissement(self.plateau[1,0])
+                    self.deplacement_glissement(self.plateau[0,0])
+            
+            elif (self.plateau.i_none,self.plateau.j_none) == (2,2):
+                if direct == 'd':
+                    self.deplacement_glissement(self.plateau[2,1])
+                    self.deplacement_glissement(self.plateau[2,0])
+                
+                elif direct == 'b':
+                    self.deplacement_glissement(self.plateau[1,2])
+                    self.deplacement_glissement(self.plateau[0,2])
+            
+        
+            
+       
 
 
 ##======================================================================#
@@ -174,14 +172,15 @@ class Jouer:
         print(joueur.couleur)
         meilleure_action = []
         for i in range(len(noeud.enfants)):
-            if noeud.enfants[i].valeur == v:
+            if (noeud.enfants[i].valeur == v and victoire(autre_joueur,noeud.enfants[i].plateau)!=True):
                 meilleure_action.append(noeud.enfants[i])
                 
         if len(meilleure_action) > 1:
             rand_enfant = random.choice(meilleure_action)
+           
+            
         
         else:
-            print(meilleure_action)
             rand_enfant = meilleure_action[0]
             
         if rand_enfant.action.num_action == 1:
@@ -196,13 +195,14 @@ class Jouer:
             if rand_enfant.action.num_pion == 3:
                 self.deplacer_pion(joueur, joueur.pion3, self.plateau[rand_enfant.action.x,rand_enfant.action.y])
         if rand_enfant.action.num_action == 4:
-            self.double_glissement()
+            self.double_glissement(rand_enfant.action.direction)
             joueur.glissement_x2=True
         if autre_joueur.glissement_x2==True:
                 autre_joueur.glissement_x2 = False
        
 
     def choix_action_joueur(self,joueur):
+       
         print(joueur.nom,"à vous de jouer")
         #on regarde si le joueur qui à jouer juste avant à effectuer le double glissement ou non
         if joueur == self.j1:
@@ -222,11 +222,7 @@ class Jouer:
             choix1 = True
             choix2 = True
             
-            if ((cout_double==False) and 
-            ((self.plateau.i_none == 0 and self.plateau.j_none == 1) or 
-            (self.plateau.i_none == 1 and self.plateau.j_none == 0) or 
-            (self.plateau.i_none == 2 and self.plateau.j_none == 1) or 
-            (self.plateau.i_none == 1 and self.plateau.j_none == 2))):
+            if ((cout_double==False) and ((self.plateau.i_none,self.plateau.j_none)!= (1,1))):
                 print("4 : deplacer 2 carres noirs")
                 choix4 = True
                 
@@ -240,11 +236,7 @@ class Jouer:
             choix2 = True
             choix3 = True
             
-            if ((cout_double==False) and 
-            ((self.plateau.i_none == 0 and self.plateau.j_none == 1) or 
-            (self.plateau.i_none == 1 and self.plateau.j_none == 0) or 
-            (self.plateau.i_none == 2 and self.plateau.j_none == 1) or 
-            (self.plateau.i_none == 1 and self.plateau.j_none == 2))):
+            if ((cout_double==False) and ((self.plateau.i_none,self.plateau.j_none)!= (1,1))):
                 print("4 : deplacer 2 carres noirs")
                 choix4 = True
         
@@ -255,11 +247,7 @@ class Jouer:
             choix2 = True
             choix3 = True
             
-            if ((cout_double==False) and 
-            ((self.plateau.i_none == 0 and self.plateau.j_none == 1) or 
-            (self.plateau.i_none == 1 and self.plateau.j_none == 0) or 
-            (self.plateau.i_none == 2 and self.plateau.j_none == 1) or 
-            (self.plateau.i_none == 1 and self.plateau.j_none == 2))):
+            if ((cout_double==False) and ((self.plateau.i_none,self.plateau.j_none)!= (1,1))):
                 print("4 : deplacer 2 carres noirs")
                 choix4 = True
             
@@ -380,9 +368,58 @@ class Jouer:
                 self.choix_action_joueur(joueur)
                 
         elif choix == 4 and choix4 == True:
-            self.double_glissement()
-            joueur.glissement_x2=True       #on indique dans la classe joueur qu'il a fait le cout_double
-        
+            if((self.plateau.i_none == 0 and self.plateau.j_none == 1) or 
+               (self.plateau.i_none == 1 and self.plateau.j_none == 0) or 
+               (self.plateau.i_none == 2 and self.plateau.j_none == 1) or 
+               (self.plateau.i_none == 1 and self.plateau.j_none == 2)):
+                    self.double_glissement()
+                    joueur.glissement_x2=True       #on indique dans la classe joueur qu'il a fait le cout_double
+            
+            else:
+                if (self.plateau.i_none == 0 and self.plateau.j_none == 0):
+                    print("direction du déplacement: g=gauche ou h=haut")
+                    direction = input("direction = ")
+                    if (direction == 'g' or direction == 'h'):
+                        self.double_glissement(direction)
+                        joueur.glissement_x2=True
+                    else:
+                        print("vous ne pouvez pas faire cette action")
+                        self.choix_action_joueur(joueur)
+                        
+                
+                elif (self.plateau.i_none == 0 and self.plateau.j_none == 2):
+                    print("direction du déplacement: d=droite ou h=haut")
+                    direction = input("direction = ")
+                    print(direction)
+                    print(type(direction))
+                    if (direction == 'd' or direction =='h'):
+                        self.double_glissement(direction)
+                        joueur.glissement_x2=True
+                        
+                    else:
+                        print("vous ne pouvez pas faire cette action")
+                        self.choix_action_joueur(joueur)
+                
+                elif (self.plateau.i_none == 2 and self.plateau.j_none == 0):
+                    print("direction du déplacement: g=gauche ou b=bas")
+                    direction = input("direction = ")
+                    if (direction == 'g' or direction =='b'):
+                        self.double_glissement(direction)
+                        joueur.glissement_x2=True
+                    else:
+                        print("vous ne pouvez pas faire cette action")
+                        self.choix_action_joueur(joueur)
+                        
+                        
+                elif (self.plateau.i_none == 2 and self.plateau.j_none == 2):
+                    print("direction du déplacement: d=droite ou b=bas")
+                    direction = input("direction = ")
+                    if (direction == 'd' or direction =='b'):
+                        self.double_glissement(direction)
+                        joueur.glissement_x2=True
+                    else:
+                        print("vous ne pouvez pas faire cette action")
+                        self.choix_action_joueur(joueur)
         else:
             print("vous ne pouvez pas faire cette action")
             self.choix_action_joueur(joueur)
@@ -523,18 +560,82 @@ def eval_nb_pions(joueur,plateau):
             return -1
         
         else:
-            return 0    
+            return 0  
+
+
+
+def eval_between(joueur, plateau):
+    res = 0
+       
+    for i in range(3):
+        if (plateau[1,i]!=None  and plateau[1,i].pion!= None 
+               and plateau[1,i].pion.couleur == joueur.couleur and
+               plateau[0,i]!=None  and plateau[0,i].pion!= None 
+               and plateau[0,i].pion.couleur != joueur.couleur and
+               plateau[2,i]!=None  and plateau[2,i].pion!= None 
+               and plateau[2,i].pion.couleur != joueur.couleur):
+                   res = 2
+            
+        if (plateau[i,1]!=None  and plateau[i,1].pion!= None 
+               and plateau[i,1].pion.couleur == joueur.couleur and
+               plateau[i,0]!=None  and plateau[i,0].pion!= None 
+               and plateau[i,0].pion.couleur != joueur.couleur and
+               plateau[i,2]!=None  and plateau[i,2].pion!= None 
+               and plateau[i,2].pion.couleur != joueur.couleur):
+                   res = 2
+    return res
+               
+def coin_prioritaire2(joueur, plateau):
+    res = 0
+       
+    for i in range(3):
+        if (plateau[0,i]!=None  and plateau[0,i].pion!= None 
+               and plateau[0,i].pion.couleur == joueur.couleur and
+               plateau[1,i]!=None  and plateau[1,i].pion!= None 
+               and plateau[0,i].pion.couleur != joueur.couleur and
+               plateau[2,i]!=None  and plateau[2,i].pion!= None 
+               and plateau[2,i].pion.couleur != joueur.couleur):
+                   res = 1
+                   
+        if (plateau[2,i]!=None  and plateau[2,i].pion!= None 
+               and plateau[2,i].pion.couleur == joueur.couleur and
+               plateau[1,i]!=None  and plateau[1,i].pion!= None 
+               and plateau[1,i].pion.couleur != joueur.couleur and
+               plateau[0,i]!=None  and plateau[0,i].pion!= None 
+               and plateau[0,i].pion.couleur != joueur.couleur):
+                   res = 1
+            
+        if (plateau[i,0]!=None  and plateau[i,0].pion!= None 
+               and plateau[i,0].pion.couleur == joueur.couleur and
+               plateau[i,1]!=None  and plateau[i,1].pion!= None 
+               and plateau[i,1].pion.couleur != joueur.couleur and
+               plateau[i,2]!=None  and plateau[i,2].pion!= None 
+               and plateau[i,2].pion.couleur != joueur.couleur):
+                   res = 1
+                   
+        if (plateau[i,2]!=None  and plateau[i,2].pion!= None 
+               and plateau[i,2].pion.couleur == joueur.couleur and
+               plateau[i,1]!=None  and plateau[i,1].pion!= None 
+               and plateau[i,1].pion.couleur != joueur.couleur and
+               plateau[i,0]!=None  and plateau[i,0].pion!= None 
+               and plateau[i,0].pion.couleur != joueur.couleur):
+                   res = 1
+    return res
         
 def evaluation(joueur_max,joueur_min,plateau):
         
         if victoire(joueur_max,plateau):
-            return 50.
+            return 50
         if victoire(joueur_min,plateau):
-            return -50.
+            return -50
         
         else:
             poids1 = eval_pion_position(joueur_max)
             poids1 += eval_nb_pions(joueur_max,plateau)
+            #poids1 += eval_pion_coin(joueur_max,plateau)
+            #poids1 += eval_coin_prioritaire(joueur_max, plateau)
+            poids1 += eval_between(joueur_max, plateau)
+            poids1 += coin_prioritaire2(joueur_max, plateau)
             return  poids1    
                 
 ##======================================================================#
@@ -543,24 +644,29 @@ def evaluation(joueur_max,joueur_min,plateau):
             
         
 def MaxValue(noeud, profondeur,joueur,autre_joueur):
-    if(victoire(joueur,noeud.plateau) or profondeur == 0 ):
+    
+    if(victoire(joueur,noeud.plateau) or victoire(autre_joueur,noeud.plateau) or profondeur == 0 ):
         noeud.valeur = evaluation(joueur,autre_joueur,noeud.plateau)
-        return evaluation(joueur,autre_joueur,noeud.plateau)
-    noeud.valeur = -50.
+        return noeud.valeur
+    noeud.valeur = -50
     for i in range (len(noeud.enfants)):
          
         noeud.valeur = max(noeud.valeur,MinValue(noeud.enfants[i],profondeur-1,joueur,autre_joueur))
+        
+        
     return noeud.valeur
 
 
 def MinValue(noeud, profondeur,joueur,autre_joueur):
-    if(victoire(joueur,noeud.plateau) or profondeur == 0 ):
-        noeud.valeur = evaluation(joueur,noeud.autre_joueur,noeud.plateau)
-        return evaluation(joueur,autre_joueur,noeud.plateau)
-    noeud.valeur = 50.
+    if(victoire(joueur,noeud.plateau) or victoire(autre_joueur,noeud.plateau) or profondeur == 0 ):
+         
+        noeud.valeur = evaluation(joueur,autre_joueur,noeud.plateau)
+        return noeud.valeur
+    noeud.valeur = 50
     for i in range (len(noeud.enfants)):
         
         noeud.valeur = min(noeud.valeur, MaxValue(noeud.enfants[i],profondeur-1,joueur,autre_joueur))
+        
     return noeud.valeur
                 
         
@@ -576,11 +682,12 @@ def MinMaxPL(noeud,profondeur,joueur,autre_joueur):
 ##====================================================================== 
 class Arete_Action():
     
-    def __init__(self, num_action, x=None, y=None,num_pion=None):
+    def __init__(self, num_action, x=None, y=None,num_pion=None,direction=None):
         self._num_action = num_action
         self._x = x
         self._y = y
         self._num_pion = num_pion
+        self.direction = direction
     def _get_num_action(self):
         return self._num_action
     
@@ -613,10 +720,11 @@ class Node():
         self.jeu = Jouer(copy.deepcopy(self.plateau),copy.deepcopy(self.joueur),copy.deepcopy(self.autre_joueur))
         self.creer_enfants()
         
+        
     def actions_possibles(self):
         
         res_actions = []
-        if victoire(self.joueur,self.plateau) != True or victoire(self.autre_joueur,self.plateau) != True:
+        if ((victoire(self.joueur,self.plateau) == False) or (victoire(self.autre_joueur,self.plateau) == False)):
             
             cout_double = self.autre_joueur.glissement_x2
        
@@ -629,11 +737,7 @@ class Node():
             else :
                 res_actions = [2,3]
             
-            if ((cout_double==False) and 
-                ((self.plateau.i_none == 0 and self.plateau.j_none == 1) or 
-                  (self.plateau.i_none == 1 and self.plateau.j_none == 0) or 
-                  (self.plateau.i_none == 2 and self.plateau.j_none == 1) or 
-                  (self.plateau.i_none == 1 and self.plateau.j_none == 2))):
+            if ((cout_double==False) and ((self.plateau.i_none,self.plateau.j_none)!= (1,1))):
                 res_actions.append(4)
                 self.joueur.glissement_x2 = True
             
@@ -766,11 +870,71 @@ class Node():
                     self.jeu.j1 = copy.deepcopy(self.joueur)
                     self.jeu.j2 = copy.deepcopy(self.autre_joueur)
                     
-                    self.jeu.double_glissement()
-                    action = Arete_Action(4)
-                    self.enfants.append(Node(self.profondeur-1,self.jeu.j2,
-                                        self.jeu.j1,self.jeu.plateau,action))
+                    if((self.jeu.plateau.i_none == 0 and self.jeu.plateau.j_none == 1) or 
+                       (self.jeu.plateau.i_none == 1 and self.jeu.plateau.j_none == 0) or 
+                       (self.jeu.plateau.i_none == 2 and self.jeu.plateau.j_none == 1) or 
+                       (self.jeu.plateau.i_none == 1 and self.jeu.plateau.j_none == 2)):
+                        
+                        self.jeu.double_glissement()
+                        action = Arete_Action(4)
+                        self.enfants.append(Node(self.profondeur-1,self.jeu.j2,
+                                                 self.jeu.j1,self.jeu.plateau,action))
                     
+                    elif (self.jeu.plateau[0,0]==None):
+                        
+                        self.jeu.plateau = copy.deepcopy(self.plateau)
+                        self.jeu.double_glissement('g')
+                        action = Arete_Action(4,None,None,None,'g')
+                        self.enfants.append(Node(self.profondeur-1,self.jeu.j2,
+                                                 self.jeu.j1,self.jeu.plateau,action))
+                        
+                        self.jeu.plateau = copy.deepcopy(self.plateau)
+                        self.jeu.double_glissement('h')
+                        action = Arete_Action(4,None,None,None,'h')
+                        self.enfants.append(Node(self.profondeur-1,self.jeu.j2,
+                                                 self.jeu.j1,self.jeu.plateau,action))
+                        
+                    elif (self.jeu.plateau[0,2]==None):
+                        
+                        self.jeu.plateau = copy.deepcopy(self.plateau)
+                        self.jeu.double_glissement('d')
+                        action = Arete_Action(4,None,None,None,'d')
+                        self.enfants.append(Node(self.profondeur-1,self.jeu.j2,
+                                                 self.jeu.j1,self.jeu.plateau,action))
+                        
+                        self.jeu.plateau = copy.deepcopy(self.plateau)
+                        self.jeu.double_glissement('h')
+                        action = Arete_Action(4,None,None,None,'h')
+                        self.enfants.append(Node(self.profondeur-1,self.jeu.j2,
+                                                 self.jeu.j1,self.jeu.plateau,action))
+                        
+                    elif (self.jeu.plateau[2,0]==None):
+                        
+                        self.jeu.plateau = copy.deepcopy(self.plateau)
+                        self.jeu.double_glissement('g')
+                        action = Arete_Action(4,None,None,None,'g')
+                        self.enfants.append(Node(self.profondeur-1,self.jeu.j2,
+                                                 self.jeu.j1,self.jeu.plateau,action))
+                        
+                        self.jeu.plateau = copy.deepcopy(self.plateau)
+                        self.jeu.double_glissement('b')
+                        action = Arete_Action(4,None,None,None,'b')
+                        self.enfants.append(Node(self.profondeur-1,self.jeu.j2,
+                                                 self.jeu.j1,self.jeu.plateau,action))
+                    
+                    elif (self.jeu.plateau[2,2]==None):
+                        
+                        self.jeu.plateau = copy.deepcopy(self.plateau)
+                        self.jeu.double_glissement('d')
+                        action = Arete_Action(4,None,None,None,'d')
+                        self.enfants.append(Node(self.profondeur-1,self.jeu.j2,
+                                                 self.jeu.j1,self.jeu.plateau,action))
+                        
+                        self.jeu.plateau = copy.deepcopy(self.plateau)
+                        self.jeu.double_glissement('b')
+                        action = Arete_Action(4,None,None,None,'b')
+                        self.enfants.append(Node(self.profondeur-1,self.jeu.j2,
+                                                 self.jeu.j1,self.jeu.plateau,action))
        
                     
     def affiche(self):
@@ -782,12 +946,12 @@ class Node():
                             
 
 ###test###
-# node = Node(3,Joueur("jean","r"),Joueur("pierre","b"),Plateau_jeu())                  
+# node = Node(4,Joueur("jean","r"),Joueur("pierre","b"),Plateau_jeu())                  
 # node.affiche()
-# node.enfants[0].affiche()
-# node.enfants[0].enfants[0].affiche()
-# #node.enfants[0].enfants[0].enfants[0].affiche()
-# #node.enfants[0].enfants[0].enfants[8].enfants[16].affiche()  
+# node.enfants[9].affiche()
+# node.enfants[9].enfants[8].affiche()
+# node.enfants[9].enfants[8].enfants[0].affiche()
+#node.enfants[0].enfants[0].enfants[8].enfants[1].affiche()  
 
 """test de la classe jouer"""
 """
