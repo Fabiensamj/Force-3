@@ -1,4 +1,4 @@
-Ojectif du projet: coder le jeu force 3 permettant à deux ordinateurs de jouer l'un contre l'autre
+Objectif du projet: coder le jeu force 3 permettant à deux ordinateurs de jouer l'un contre l'autre
 
 Utilisation des algorithmes Min/max et Alpha-Bêta
 
